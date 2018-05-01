@@ -34,14 +34,10 @@ const Note = require('../models/note');
 
 mongoose.connect(MONGODB_URI)
   .then(() => {
+    const id = '5ae8c3925e4f83467c2f9ed5';
 
-    const newNote = {
-      title: 'this is a title',
-      content: 'some stuff'
-    };
-
-    return Note.create(newNote)
-      .then(result => console.log(result));
+    return Note.findByIdAndRemove(id)
+      .then(results => console.log(results));
   })
   .then(()=> {mongoose.disconnect();})
   .catch( err => {

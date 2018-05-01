@@ -52,6 +52,12 @@ router.post('/', (req, res, next) => {
   const newNote = {};
   const updateableFields = ['title','content'];
 
+  if (!req.body.title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    next(err);
+  }
+
   updateableFields.forEach(field => {
     if (field in req.body) {
       newNote[field] = req.body[field];
@@ -59,24 +65,53 @@ router.post('/', (req, res, next) => {
   });
 
   return Note.create(newNote)
-    .then(result => res.json(result));
-  // res.location('path/to/new/document').status(201).json({ id: 2, title: 'Temp 2' });
+    .then(result => res.location(`${req.hostname}${req.originalUrl}${result._id}`).status(201).json(result));
 
 });
 
 /* ========== PUT/UPDATE A SINGLE ITEM ========== */
 router.put('/:id', (req, res, next) => {
 
-  console.log('Update a Note');
-  res.json({ id: 1, title: 'Updated Temp 1' });
+  const {id} = req.params;
+  
+  if (id.length !== 24){
+    const err = new Error ('Bad request');
+    err.status = 400;
+    next(err);
+  }
+
+  const updateNote = {
+    updatedAt : Date.now()
+  };
+
+  const updateableFields = ['title', 'content'];
+  updateableFields.forEach(field => {
+    if (field in req.body){
+      updateNote[field] = req.body[field];
+    }
+  });
+  
+  return Note.findByIdAndUpdate(id, updateNote, {upsert: true, new : true})
+    .then(result => res.json(result))
+    .catch(err => next(err));
 
 });
 
 /* ========== DELETE/REMOVE A SINGLE ITEM ========== */
 router.delete('/:id', (req, res, next) => {
 
-  console.log('Delete a Note');
-  res.status(204).end();
+  const {id} = req.params;
+
+  if (id.length !== 24){
+    const err = new Error ('Bad request');
+    err.status = 400;
+    next(err);
+  }
+
+  return Note.findByIdAndRemove(id)
+    .then(() => res.status(204).end())
+    .catch(err => next(err));
+  
 });
 
 module.exports = router;

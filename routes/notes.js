@@ -3,18 +3,17 @@
 const express = require('express');
 const router = express.Router();
 
-const mongoose = require('mongoose');
 const Note = require('../models/note');
 
 /* ========== GET/READ ALL ITEM ========== */
 router.get('/', (req, res, next) => {
 
   const {searchTerm} = req.query;
-  let filter= {};
+  let filter ={};
 
   if (searchTerm) {
-    const re = new RegExp(searchTerm, 'i');
-    filter.title = {$regex: re};
+    const re = new RegExp(searchTerm, 'i'); 
+    filter = {$or : [{title : re}, {content : re}]};
   }
 
   return Note.find(filter)
@@ -111,7 +110,6 @@ router.delete('/:id', (req, res, next) => {
   return Note.findByIdAndRemove(id)
     .then(() => res.status(204).end())
     .catch(err => next(err));
-  
 });
 
 module.exports = router;

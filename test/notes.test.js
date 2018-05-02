@@ -50,7 +50,7 @@ describe('Notes API', function (){
     });
   });
 
-  describe.only('GET api/notes/:id', function(){
+  describe('GET api/notes/:id', function(){
     it('should return the correct note', function(){
       const id = '000000000000000000000002';
       let res;
@@ -99,7 +99,7 @@ describe('Notes API', function (){
       const invalidId = 'notanid';
 
       return chai.request(app)
-        .get('/api/notes/${invalidId}')
+        .get(`/api/notes/${invalidId}`)
         .then(res => {
 
           expect(res).to.have.status(400);
@@ -157,5 +157,53 @@ describe('Notes API', function (){
           expect(res.body).to.have.keys(['message','error']);
         });
     });
+  });
+
+  describe('PUT /api/notes/:id', function() {
+
+    it('should update the correct note when given valid input', function(){
+      const updateObj = {
+        'title' : 'an updated note',
+        'content' : 'some new content'
+      };
+      const validExistingId = '000000000000000000000002';
+      let res;
+
+      return chai.request(app)
+        .put(`/api/notes/${validExistingId}`)
+        .send(updateObj)
+        .then(_res => {
+          res = _res;
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.keys(['id', 'title', 'content', 'updatedAt', 'createdAt']);
+          expect(res.body.title).to.be.equal('an updated note');
+
+          return note.findById(res.body.id);
+        })
+        .then(data => {
+          expect(res.body.id).to.be.equal(data.id);
+          expect(res.body.title).to.be.equal(data.title);
+          expect(res.body.content).to.be.equal(data.content);
+        });
+    });
+
+    it('should give an error when given invalid id', function(){
+      const invalidId = 'notanid';
+      const updateObj = {
+        'title' : 'hope this doesn\'t work'
+      };
+
+      return chai.request(app)
+        .put(`/api/notes/${invalidId}`)
+        .send(updateObj)
+        .then(res => {
+
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.keys(['message','error']);
+        });
+    });
+
   });
 });

@@ -90,8 +90,10 @@ router.put('/:id', (req, res, next) => {
     }
   });
   
-  return Note.findByIdAndUpdate(id, updateNote, {upsert: true, new : true})
-    .then(result => res.json(result))
+  return Note.findByIdAndUpdate(id, updateNote, {new : true, upsert: false})
+    .then(result => {
+      console.log('the api result is: ' + JSON.stringify(result));
+      res.json(result);})
     .catch(err => next(err));
 
 });

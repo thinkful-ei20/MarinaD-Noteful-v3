@@ -50,7 +50,7 @@ describe('Notes API', function (){
     });
   });
 
-  describe('GET api/notes/:id', function(){
+  describe.only('GET api/notes/:id', function(){
     it('should return the correct note', function(){
       const id = '000000000000000000000002';
       let res;
@@ -74,7 +74,41 @@ describe('Notes API', function (){
           expect(res.body.content).to.equal(data.content);
         });
     });
+
+    it('should return empty request if given a nonexistant Id', function(){
+      const notAnId = '000000000000000000000042';
+      let res;
+
+      return chai.request(app)
+        .get(`/api/notes/${notAnId}`)
+        .then (_res => {
+          res = _res;
+          
+          expect(res).to.have.status(404);
+          expect(res).to.be.json;
+          expect(res.body).to.have.keys(['error', 'message']);
+
+          return note.findById(notAnId);
+        })
+        .then(data => {
+          expect(data).not.to.exist;
+        });
+    });
+
+    it ('should return 400 error when given an invalid id', function(){
+      const invalidId = 'notanid';
+
+      return chai.request(app)
+        .get('/api/notes/${invalidId}')
+        .then(res => {
+
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.keys(['message','error']);
+        });
+
+    });
   });
+
   describe('POST /api/notes', function(){
     it('should create and return a new item with valid data', 
       function() {
@@ -105,5 +139,23 @@ describe('Notes API', function (){
           });
 
       });
+
+    it('should return an error when not given a title', function(){
+      const invalidObj = {
+        'content': 'stuff'
+      };
+
+      let res;
+
+      return chai.request(app)
+        .post('/api/notes')
+        .send(invalidObj)
+        .then (_res => {
+          res = _res;
+
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.keys(['message','error']);
+        });
+    });
   });
 });

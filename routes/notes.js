@@ -33,7 +33,7 @@ router.get('/:id', (req, res, next) => {
   if (id.length !== 24){
     const err = new Error ('Bad request');
     err.status = 400;
-    next(err);
+    return next(err);
   }
   return Note.findById(id)
     .then((results)=> {
@@ -54,7 +54,7 @@ router.post('/', (req, res, next) => {
   if (!req.body.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
-    next(err);
+    return next(err);
   }
 
   updateableFields.forEach(field => {
@@ -76,7 +76,7 @@ router.put('/:id', (req, res, next) => {
   if (id.length !== 24){
     const err = new Error ('Bad request');
     err.status = 400;
-    next(err);
+    return next(err);
   }
 
   const updateNote = {
@@ -104,7 +104,7 @@ router.delete('/:id', (req, res, next) => {
   if (id.length !== 24){
     const err = new Error ('Bad request');
     err.status = 400;
-    next(err);
+    return next(err);
   }
 
   return Note.findByIdAndRemove(id)

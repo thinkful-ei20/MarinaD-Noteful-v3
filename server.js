@@ -52,9 +52,16 @@ mongoose.connect(MONGODB_URI)
     console.error('\n === DID you start `mongod`??? ===\n');
     console.error(err);
   });
+
 // Listen for incoming connections
-app.listen(PORT, function () {
-  console.info(`Server listening on ${this.address().port}`);
-}).on('error', err => {
-  console.error(err);
-});
+if (require.main === module) {
+  app.listen(PORT, function () {
+    console.info(`Server listening on ${this.address().port}`);
+  }).on('error', err => {
+    console.error(err);
+  });
+}  
+
+module.exports = app;
+
+

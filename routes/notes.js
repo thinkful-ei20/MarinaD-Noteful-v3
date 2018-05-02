@@ -12,7 +12,7 @@ router.get('/', (req, res, next) => {
   let filter ={};
 
   if (searchTerm) {
-    const re = new RegExp(searchTerm, 'i'); 
+    const re = new RegExp(searchTerm, 'i');
     filter = {$or : [{title : re}, {content : re}]};
   }
 

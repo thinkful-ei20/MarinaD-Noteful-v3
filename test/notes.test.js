@@ -204,6 +204,36 @@ describe('Notes API', function (){
           expect(res.body).to.have.keys(['message','error']);
         });
     });
+  });
 
+  describe('DELTE /api/notes/:id', function(){
+
+    it('should delete a note when given a valid id', function(){
+      const id = '000000000000000000000003';
+
+      return chai.request(app)
+        .delete(`/api/notes/${id}`)
+        .then(res => {
+          
+          expect(res).to.have.status(204);
+
+          return note.findByIdAndRemove(id);
+        })
+        .then(data => {
+          expect(data).not.to.exist;
+        });
+    });
+
+    it('should return an error when given an invalid id', function(){
+      const invalidId = 'notanid';
+
+      return chai.request(app)
+        .delete(`/api/notes/${invalidId}`)
+        .then(res => {
+
+          expect(res).to.have.status(400);
+          expect(res.body).to.have.keys(['message','error']);
+        });
+    });
   });
 });

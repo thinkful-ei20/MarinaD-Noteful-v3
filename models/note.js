@@ -8,15 +8,7 @@ const noteSchema = mongoose.Schema({
     required : true
   },
   content : String,
-  createdAt : {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt : {
-    type: Date,
-    default: Date.now
-  }
-});
+},{timestamps : true});
 
 noteSchema.set('toObject', {
   transform: function (doc, ret){

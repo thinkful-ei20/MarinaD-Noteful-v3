@@ -35,9 +35,10 @@ const Note = require('../models/note');
 mongoose.connect(MONGODB_URI)
   .then(() => {
     const id = '5ae8c3925e4f83467c2f9ed5';
-
-    return Note.findByIdAndRemove(id)
-      .then(results => console.log(results));
+    console.log('file ran');
+    return Note.update({}, 
+      {$pull : {tags : '222222222222222222222200'}},
+      {multi : true});
   })
   .then(()=> {mongoose.disconnect();})
   .catch( err => {

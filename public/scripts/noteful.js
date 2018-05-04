@@ -246,7 +246,9 @@ const noteful = (function () {
   function handleFolderDeleteClick() {
     $('.js-folders-list').on('click', '.js-folder-delete', event => {
       event.preventDefault();
+      console.log('handle folder delete click triggered');
       const folderId = getFolderIdFromElement(event.currentTarget);
+      console.log('folder id is: ' + folderId);
 
       if (folderId === store.currentQuery.folderId) {
         store.currentQuery.folderId = null;

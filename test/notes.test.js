@@ -6,6 +6,7 @@ const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 
 const app = require('../server');
+require('dotenv').config();
 const {TEST_MONGODB_URI} = require('../config');
 
 const note = require('../models/note');
@@ -16,9 +17,10 @@ const seedFolderData = require('../db/seed/folders');
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe.only('Notes API', function (){
+describe('Notes API', function (){
   before(function (){
-    return mongoose.connect(TEST_MONGODB_URI);
+    return mongoose.connect(TEST_MONGODB_URI)
+      .then(()=> mongoose.connection.db.dropDatabase());
   });
   beforeEach(function(){
     return note.insertMany(seedNoteData)

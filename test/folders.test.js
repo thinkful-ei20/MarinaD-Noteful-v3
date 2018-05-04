@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const mocha = require('mocha');
 
 const app = require('../server');
+require('dotenv').config();
 const {TEST_MONGODB_URI} = require('../config');
 
 const folder = require('../models/folder');

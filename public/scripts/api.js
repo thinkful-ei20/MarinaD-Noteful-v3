@@ -37,6 +37,7 @@ const api = (function () {
     });
   };
   const remove = function(path) {
+    console.log('remove function ran to path: '+ path);
     return $.ajax({
       type: 'DELETE',
       dataType: 'json',

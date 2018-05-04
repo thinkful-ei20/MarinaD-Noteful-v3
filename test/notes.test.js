@@ -46,6 +46,7 @@ describe('Notes API', function (){
           expect(res.status).to.equal(200);
           expect(res.body).to.be.an('array');
           expect (res).to.be.json;
+          expect(res.body[0]).to.have.keys(['tags','title','content','folderId','id','createdAt','updatedAt']);
           
           return note.find();
         })
@@ -68,17 +69,17 @@ describe('Notes API', function (){
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.keys('id', 'title', 'content',
-            'createdAt', 'updatedAt', 'folderId');
+            'createdAt', 'updatedAt', 'folderId','tags');
+          expect(res.body.tags).to.be.an('array');
           //Call database
 
           return note.findById(id);
         })
         .then(data => {
-          //Compare
           expect(res.body.id).to.equal(data.id);
           expect(res.body.title).to.equal(data.title);
           expect(res.body.content).to.equal(data.content);
-        });
+          expect(res.body.folderId).to.equal(data.folderId.toString());        });
     });
 
     it('should return empty request if given a nonexistant Id', function(){
@@ -89,7 +90,6 @@ describe('Notes API', function (){
         .get(`/api/notes/${notAnId}`)
         .then (_res => {
           res = _res;
-          
           expect(res).to.have.status(404);
           expect(res).to.be.json;
           expect(res.body).to.have.keys(['error', 'message']);
@@ -121,7 +121,8 @@ describe('Notes API', function (){
         const newItem = {
           'title' : 'The best article evar',
           'content': 'some stuff',
-          'folderId' : '111111111111111111111102'
+          'folderId' : '111111111111111111111102',
+          'tags' : ['222222222222222222222201']
         };
 
         let res;
@@ -135,7 +136,8 @@ describe('Notes API', function (){
             expect(res).to.have.header('location');
             expect(res).to.be.json;
             expect(res.body).to.be.a('object');
-            expect(res.body).to.have.keys('folderId', 'id','title','content','createdAt','updatedAt');
+            expect(res.body).to.have.keys('tags','folderId', 'id','title','content','createdAt','updatedAt');
+            expect(res.body.tags).to.be.an('array');
             //Call the Database
             return note.findById(res.body.id);
           })
@@ -145,6 +147,7 @@ describe('Notes API', function (){
             expect(res.body.title).to.equal(data.title);
             expect(res.body.content).to.equal(data.content);
             expect(res.body.folderId).to.equal(stringFolderId);
+            expect(res.body.tags.length).to.equal(data.tags.length);
           });
 
       });
@@ -174,7 +177,8 @@ describe('Notes API', function (){
       const updateObj = {
         'title' : 'an updated note',
         'content' : 'some new content',
-        'folderId' : '111111111111111111111101'
+        'folderId' : '111111111111111111111101',
+        'tags' : ['222222222222222222222203']
       };
       const validExistingId = '000000000000000000000002';
       let res;
@@ -187,7 +191,7 @@ describe('Notes API', function (){
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys(['folderId', 'id', 'title', 'content', 'updatedAt', 'createdAt']);
+          expect(res.body).to.have.keys(['tags','folderId', 'id', 'title', 'content', 'updatedAt', 'createdAt']);
           expect(res.body.title).to.be.equal('an updated note');
 
           return note.findById(res.body.id);
@@ -198,6 +202,7 @@ describe('Notes API', function (){
           expect(res.body.title).to.be.equal(data.title);
           expect(res.body.content).to.be.equal(data.content);
           expect(res.body.folderId).to.be.equal(stringFolderId);
+          expect(res.body.tags.length).to.equal(data.tags.length);
         });
     });
 

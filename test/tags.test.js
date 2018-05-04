@@ -219,7 +219,7 @@ describe('Tags API', function(){
 
   });
 
-  describe.only('DELETE /api/tags/:id', function(){
+  describe('DELETE /api/tags/:id', function(){
     it('should delete a tag given valid id', function(){
       const id = '222222222222222222222200';
 

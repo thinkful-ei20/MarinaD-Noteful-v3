@@ -35,11 +35,13 @@ const Note = require('../models/note');
 mongoose.connect(MONGODB_URI)
   .then(() => {
     const id = '5ae8c3925e4f83467c2f9ed5';
-    console.log('file ran');
-    return Note.update({}, 
-      {$pull : {tags : '222222222222222222222200'}},
-      {multi : true});
+    const filter = {};
+    const tagId = '222222222222222222222201';
+    filter.tags = {$elematch : {_id : tagId}};
+    //return Note.find().limit(1);
+    return Note.find({tags : tagId});
   })
+  .then(data => console.log(data))
   .then(()=> {mongoose.disconnect();})
   .catch( err => {
     console.error(`ERROR: ${err.message}`);

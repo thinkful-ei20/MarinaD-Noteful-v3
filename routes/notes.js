@@ -117,7 +117,7 @@ router.put('/:id', (req, res, next) => {
   });
 
   if(!mongoose.Types.ObjectId.isValid(id)||(
-  folderId && !mongoose.Types.ObjectId.isValid(folderId))){
+    folderId && !mongoose.Types.ObjectId.isValid(folderId))){
     const error = new Error('Bad request');
     error.status = 400;
     return next(error);

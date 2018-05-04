@@ -15,7 +15,7 @@ const seedData = require('../db/seed/folders');
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('Folders API', function(){
+describe.only('Folders API', function(){
   //Setup Database
   before(function(){
     return mongoose.connect(TEST_MONGODB_URI);

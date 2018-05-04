@@ -9,20 +9,23 @@ const app = require('../server');
 const {TEST_MONGODB_URI} = require('../config');
 
 const note = require('../models/note');
-const seedData = require('../db/seed/notes');
+const folder = require('../models/folder');
+const seedNoteData = require('../db/seed/notes');
+const seedFolderData = require('../db/seed/folders');
 
 const expect = chai.expect;
 chai.use(chaiHttp);
 
-describe('Notes API', function (){
+describe.only('Notes API', function (){
   before(function (){
-    return mongoose.connect(TEST_MONGODB_URI)
-      .then(()=> mongoose.connection.db.dropDatabase());
+    return mongoose.connect(TEST_MONGODB_URI);
   });
   beforeEach(function(){
-    return mongoose.connection.db.dropDatabase()
-      .then(()=> note.insertMany(seedData))
-      .then(()=> note.createIndexes());
+    return note.insertMany(seedNoteData)
+      .then(folder.insertMany(seedFolderData)) 
+      .then(()=> note.createIndexes())
+      .then(() => folder.createIndexes())
+      .catch(err => console.error(err));
   });
   afterEach(function(){
     return mongoose.connection.db.dropDatabase();
@@ -63,8 +66,9 @@ describe('Notes API', function (){
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body).to.have.keys('id', 'title', 'content',
-            'createdAt', 'updatedAt');
+            'createdAt', 'updatedAt', 'folderId');
           //Call database
+
           return note.findById(id);
         })
         .then(data => {
@@ -114,7 +118,8 @@ describe('Notes API', function (){
       function() {
         const newItem = {
           'title' : 'The best article evar',
-          'content': 'some stuff'
+          'content': 'some stuff',
+          'folderId' : '111111111111111111111102'
         };
 
         let res;
@@ -128,14 +133,16 @@ describe('Notes API', function (){
             expect(res).to.have.header('location');
             expect(res).to.be.json;
             expect(res.body).to.be.a('object');
-            expect(res.body).to.have.keys('id','title','content','createdAt','updatedAt');
+            expect(res.body).to.have.keys('folderId', 'id','title','content','createdAt','updatedAt');
             //Call the Database
             return note.findById(res.body.id);
           })
           //Compare data
           .then(data => {
+            const stringFolderId = data.folderId.toString();
             expect(res.body.title).to.equal(data.title);
             expect(res.body.content).to.equal(data.content);
+            expect(res.body.folderId).to.equal(stringFolderId);
           });
 
       });
@@ -164,7 +171,8 @@ describe('Notes API', function (){
     it('should update the correct note when given valid input', function(){
       const updateObj = {
         'title' : 'an updated note',
-        'content' : 'some new content'
+        'content' : 'some new content',
+        'folderId' : '111111111111111111111101'
       };
       const validExistingId = '000000000000000000000002';
       let res;
@@ -177,15 +185,17 @@ describe('Notes API', function (){
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
-          expect(res.body).to.have.keys(['id', 'title', 'content', 'updatedAt', 'createdAt']);
+          expect(res.body).to.have.keys(['folderId', 'id', 'title', 'content', 'updatedAt', 'createdAt']);
           expect(res.body.title).to.be.equal('an updated note');
 
           return note.findById(res.body.id);
         })
         .then(data => {
+          const stringFolderId = data.folderId.toString();
           expect(res.body.id).to.be.equal(data.id);
           expect(res.body.title).to.be.equal(data.title);
           expect(res.body.content).to.be.equal(data.content);
+          expect(res.body.folderId).to.be.equal(stringFolderId);
         });
     });
 
@@ -237,5 +247,3 @@ describe('Notes API', function (){
     });
   });
 });
-
-//begin testing!

@@ -7,6 +7,7 @@ const mongoose = require('mongoose');
 const { MONGODB_URI, PORT } = require('./config');
 
 const notesRouter = require('./routes/notes');
+const foldersRouter = require('./routes/folders');
 
 // Create an Express application
 const app = express();
@@ -24,6 +25,7 @@ app.use(express.json());
 
 // Mount routers
 app.use('/api/notes', notesRouter);
+app.use('/api/folders', foldersRouter);
 
 // Catch-all 404
 app.use(function (req, res, next) {
@@ -42,19 +44,20 @@ app.use(function (err, req, res, next) {
   });
 });
 
-mongoose.connect(MONGODB_URI)
-  .then(instance => {
-    const conn = instance.connections[0];
-    console.info(`Connected to: mongodb://${conn.host}:${conn.port}/${conn.name}`);
-  })
-  .catch(err=> {
-    console.error(`ERROR: ${err.message}`);
-    console.error('\n === DID you start `mongod`??? ===\n');
-    console.error(err);
-  });
-
-// Listen for incoming connections
 if (require.main === module) {
+  mongoose.connect(MONGODB_URI)
+    .then(instance => {
+      const conn = instance.connections[0];
+      console.info(`Connected to: mongodb://${conn.host}:${conn.port}/${conn.name}`);
+    })
+    .catch(err=> {
+      console.error(`ERROR: ${err.message}`);
+      console.error('\n === DID you start `mongod`??? ===\n');
+      console.error(err);
+    });
+
+  // Listen for incoming connections
+
   app.listen(PORT, function () {
     console.info(`Server listening on ${this.address().port}`);
   }).on('error', err => {

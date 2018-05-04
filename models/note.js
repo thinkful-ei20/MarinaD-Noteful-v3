@@ -8,6 +8,7 @@ const noteSchema = mongoose.Schema({
     required : true
   },
   content : String,
+  folderId : {type: mongoose.Schema.Types.ObjectId, ref: 'Folder'}
 },{timestamps : true});
 
 noteSchema.set('toObject', {
